@@ -400,4 +400,22 @@ class ObjectAccessorTests: TestCase {
 
         XCTAssertTrue(link2.dynamicList("array2")[0].isSameObject(as: obj))
     }
+
+    func testPropertiesOutlivingParentObject() {
+        var optional: RealmOptional<Int>!
+        var list: List<Int>!
+//        var linkingObjects = linkingObjects<Object>!
+
+        let realm = try! Realm()
+        try! realm.write {
+            autoreleasepool {
+                optional = realm.create(SwiftOptionalObject.self, value: ["optIntCol": 1]).optIntCol
+                list = realm.create(SwiftListObject.self, value: ["int": [1]]).int
+            }
+        }
+
+        XCTAssertEqual(optional.value, 1)
+        XCTAssertEqual(list.count, 1)
+        XCTAssertEqual(list[0], 1)
+    }
 }
